@@ -9,22 +9,22 @@ from hospital.views.department import (
 
 urlpatterns = [
     path(
-        "",
+        "create/",
         CreateDepartmentView.as_view(),
         name="create-department",
     ),
     path(
-        "",
+        "list/",
         ListDepartmentView.as_view(),
         name="list-department",
     ),
     path(
-        "",
+        "retrieve/<uuid:pk>",
         RetrieveDepartmentView.as_view(),
         name="create-department",
     ),
     path(
-        "",
+        "update/<uuid:pk>",
         UpdateDepartmentView.as_view(),
         name="update-department",
     ),

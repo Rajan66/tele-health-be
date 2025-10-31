@@ -1,17 +1,18 @@
 from django.contrib import admin  # noqa
+
 from django.conf import settings as S
 from django.conf.urls.static import static
-from django.urls import path, include
 
-# DRF & Swagger
-from rest_framework.authentication import BasicAuthentication
-from rest_framework.permissions import IsAdminUser
+from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularJSONAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework.authentication import BasicAuthentication
 
+# swagger config
+from rest_framework.permissions import IsAdminUser
 
 urlpatterns = []
 
@@ -51,4 +52,9 @@ urlpatterns += [
 
 urlpatterns += [
     path("gatekeeper/", include("gatekeeper.urls")),
+    path("hospital/", include("hospital.urls")),
+    # path("docter/", include("doctor.urls")),
+    # path("worker/", include("worker.urls")),
+    # path("appointment/", include("appointment.urls")),
+    # path("notification/", include("notification.urls")),
 ] + static(S.MEDIA_URL, document_root=S.MEDIA_ROOT)

@@ -1,7 +1,7 @@
-from hospital.serializers.department.list import (  # noqa
+from hospital.serializers.hospital.list import (  # noqa
     ListHospitalSerializer,
 )
-from hospital.serializers.department.retrieve import (
+from hospital.serializers.hospital.retrieve import (
     RetrieveHospitalSerializer,
 )
 
