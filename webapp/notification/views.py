@@ -1,5 +1,7 @@
+from django.db import models
 from rest_framework.generics import ListAPIView, UpdateAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from notification.models import Notification
 from .serializers import NotificationSerializer
@@ -7,19 +9,25 @@ from .serializers import NotificationSerializer
 
 class NotificationListAPIView(ListAPIView):
     serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by(
-            "-created_at"
-        )
+        user = self.request.user
+        return Notification.objects.filter(
+            models.Q(doctor=user) | models.Q(health_worker=user)
+        ).order_by("-created_at")
 
 
 class NotificationMarkAsReadAPIView(UpdateAPIView):
-    serializer_class = NotificationSerializer
+    serializer_class = None
+    permission_classes = [IsAuthenticated]
     lookup_field = "id"
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        user = self.request.user
+        return Notification.objects.filter(
+            models.Q(doctor=user) | models.Q(health_worker=user)
+        )
 
     def patch(self, request, *args, **kwargs):
         notification = self.get_object()
@@ -30,9 +38,13 @@ class NotificationMarkAsReadAPIView(UpdateAPIView):
 
 
 class NotificationMarkAllAsReadAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = None
+
     def post(self, request):
+        user = request.user
         notifications = Notification.objects.filter(
-            user=request.user, is_read=False
+            models.Q(doctor=user) | models.Q(health_worker=user), is_read=False
         )
         count = notifications.count()
         notifications.update(is_read=True)
