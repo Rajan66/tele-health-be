@@ -56,5 +56,5 @@ urlpatterns += [
     path("doctor/", include("doctor.urls")),
     # path("worker/", include("worker.urls")),
     path("appointment/", include("appointment.urls")),
-    # path("notification/", include("notification.urls")),
+    path("notification/", include("notification.urls")),
 ] + static(S.MEDIA_URL, document_root=S.MEDIA_ROOT)
