@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta  # noqa
 from dotenv import load_dotenv
 from pathlib import Path
 

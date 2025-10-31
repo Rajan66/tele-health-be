@@ -7,6 +7,7 @@ class Command(BaseCommand):
     help = "Seed default hospitals"
 
     def handle(self, *args, **options):
+        Hospital.objects.all().delete()
         hospital_data = [
             {
                 "name": "City Hospital",

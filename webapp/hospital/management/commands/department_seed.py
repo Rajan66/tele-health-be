@@ -9,6 +9,7 @@ class Command(BaseCommand):
     help = "Seed departments for all hospitals"
 
     def handle(self, *args, **options):
+        Department.objects.all().delete()
         departments = [
             "General Medicine",
             "Pediatrics",
