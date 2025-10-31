@@ -1,38 +1,62 @@
-from rest_framework import serializers  # noqa
+from rest_framework import serializers
 from appointment.models import Appointment
 from notification.models import Notification
+import uuid
 
 
 class CreateAppointmentSerializer(serializers.ModelSerializer):
+    meeting_link = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Appointment
-        fields = "__all__"
-        read_only_fields = ["status", "created_at", "health_worker"]
+        fields = [
+            "id",
+            "doctor",
+            "health_worker",
+            "start_time",
+            "end_time",
+            "status",
+            "meeting_link",
+            "notes",
+        ]
+        read_only_fields = [
+            "status",
+            "health_worker",
+            "meeting_link",
+        ]
+
+    def get_meeting_link(self, obj):
+        if not getattr(obj, "room_id", None):
+            return None
+        frontend_url = "http://localhost:3000/meeting"
+        return f"{frontend_url}?room_id={obj.room_id}"
 
     def create(self, validated_data):
         request = self.context["request"]
-        health_worker = request.user.healthworker
-        time_slot = validated_data["time_slot"]
 
-        # 1️⃣ Mark the time slot as booked
-        if time_slot.is_booked:
-            raise serializers.ValidationError(
-                "This time slot is already booked."
-            )
-        time_slot.is_booked = True
-        time_slot.save()
+        health_worker = request.user.health_worker_profile
 
-        # 2️⃣ Create appointment
+        # generate room id
+        room_id = str(uuid.uuid4())
+
         appointment = Appointment.objects.create(
-            health_worker=health_worker, **validated_data
+            health_worker=health_worker,
+            **validated_data,
         )
 
-        # 3️⃣ Send notification to the doctor
+        # set meeting link
+        appointment.meeting_link = (
+            f"http://localhost:3000/meeting?room_id={room_id}"
+        )
+        appointment.save()
+
+        # create notification
         Notification.objects.create(
-            user=appointment.doctor.user,
+            doctor=appointment.doctor.user,
+            health_worker=request.user,
             message=f"New appointment booked by {
-                health_worker.user.email
-            } for {time_slot.start_time}.",
+                request.user.email
+            }. Here's the meeting link: {appointment.meeting_link}",
         )
 
         return appointment

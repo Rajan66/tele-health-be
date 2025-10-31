@@ -21,9 +21,6 @@ class Appointment(BaseModel):
     health_worker = models.ForeignKey(
         HealthWorker, on_delete=models.CASCADE, related_name="appointments"
     )
-    hospital = models.ForeignKey(
-        Hospital, on_delete=models.CASCADE, related_name="appointments"
-    )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
