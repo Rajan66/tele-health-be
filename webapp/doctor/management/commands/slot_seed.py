@@ -1,10 +1,10 @@
-from datetime import datetime, time
+from datetime import datetime, date, time, timedelta
 from django.core.management.base import BaseCommand
 from doctor.models import Doctor, TimeSlot
 
 
 class Command(BaseCommand):
-    help = "Seed time slots for all doctors"
+    help = "Seed time slots for all doctors for the next 30 days"
 
     def handle(self, *args, **options):
         TimeSlot.objects.all().delete()
@@ -33,21 +33,26 @@ class Command(BaseCommand):
             )
             return
 
-        for doctor in doctors:
-            for start, end in slot_durations:
-                # Combine with today's date
-                today = datetime.today().date()
-                start_dt = datetime.combine(today, start)
-                end_dt = datetime.combine(today, end)
+        today = date.today()
+        days_to_seed = 7
 
-                TimeSlot.objects.get_or_create(
-                    doctor=doctor,
-                    start_time=start_dt,
-                    end_time=end_dt,
-                )
+        for doctor in doctors:
+            for day_offset in range(days_to_seed):
+                current_day = today + timedelta(days=day_offset)
+                for start, end in slot_durations:
+                    start_dt = datetime.combine(current_day, start)
+                    end_dt = datetime.combine(current_day, end)
+
+                    TimeSlot.objects.get_or_create(
+                        doctor=doctor,
+                        start_time=start_dt,
+                        end_time=end_dt,
+                    )
 
             self.stdout.write(
-                self.style.SUCCESS(f"✅ Slots created for {doctor.user.email}")
+                self.style.SUCCESS(
+                    f"✅ Slots created for {doctor.user.email} for 7 days"
+                )
             )
 
         self.stdout.write(

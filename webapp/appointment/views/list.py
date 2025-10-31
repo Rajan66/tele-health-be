@@ -1,10 +1,12 @@
 from rest_framework.generics import ListAPIView  # noqa
+from rest_framework.permissions import IsAuthenticated
 from appointment.models import Appointment
-from appointment.serializers import CreateAppointmentSerializer
+from appointment.serializers import ListAppointmentSerializer
 
 
 class ListAppointmentView(ListAPIView):
-    serializer_class = CreateAppointmentSerializer
+    serializer_class = ListAppointmentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
