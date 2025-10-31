@@ -9,6 +9,9 @@ class Command(BaseCommand):
     help = "Seed doctors for existing departments"
 
     def handle(self, *args, **options):
+        Doctor.objects.all().delete()
+        self.stdout.write(self.style.WARNING("🗑 Cleared all existing data"))
+
         departments = Department.objects.select_related("hospital").all()
         if not departments.exists():
             self.stdout.write(

@@ -8,7 +8,19 @@ class ListDoctorFilter(filters.FilterSet):
         lookup_expr="icontains",
     )
 
+    department = filters.UUIDFilter(
+        required=False,
+    )
+
+    is_available = filters.BooleanFilter(
+        required=False,
+    )
+
     class Meta:
         model = Doctor
 
-        fields = ("iname",)
+        fields = (
+            "iname",
+            "department",
+            "is_available",
+        )

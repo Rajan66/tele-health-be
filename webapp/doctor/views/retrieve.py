@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView  # noqa
 
 from doctor.serializers.doctor import RetrieveDoctorSerializer
 
