@@ -53,7 +53,7 @@ urlpatterns += [
 urlpatterns += [
     path("gatekeeper/", include("gatekeeper.urls")),
     path("hospital/", include("hospital.urls")),
-    # path("docter/", include("doctor.urls")),
+    path("doctor/", include("doctor.urls")),
     # path("worker/", include("worker.urls")),
     # path("appointment/", include("appointment.urls")),
     # path("notification/", include("notification.urls")),
