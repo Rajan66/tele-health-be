@@ -9,6 +9,7 @@ class ListDoctorTimeSlotView(ListAPIView):
     serializer_class = TimeSlotSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["is_booked"]
+    queryset = TimeSlot.objects.none()
 
     def get_queryset(self):
         doctor_id = self.kwargs.get("doctor_id")
