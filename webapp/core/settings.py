@@ -34,6 +34,12 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     # Local apps
+    "appointment",
+    "doctor",
+    "gatekeeper",
+    "hospital",
+    "notification",
+    "worker",
 ]
 
 MIDDLEWARE = [
@@ -142,3 +148,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+AUTH_USER_MODEL = "gatekeeper.User"
