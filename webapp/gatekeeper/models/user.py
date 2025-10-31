@@ -6,8 +6,18 @@ from gatekeeper.managers import UserManager
 
 
 class User(AbstractUser):
+    ROLE_CHOICES = [
+        ("hospital", "Hospital"),
+        ("doctor", "Doctor"),
+        ("health_worker", "Health Worker"),
+    ]
+
     username = None
+
     email = models.EmailField(_("email address"), unique=True)
+    role = models.CharField(
+        max_length=20, choices=ROLE_CHOICES, default="health_worker"
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
