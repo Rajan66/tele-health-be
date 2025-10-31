@@ -1,5 +1,9 @@
 from django.urls import path  # noqa
-from doctor.views import ListDoctorView, RetrieveDoctorView
+from doctor.views import (
+    ListDoctorView,
+    RetrieveDoctorView,
+    ListDoctorTimeSlotView,
+)
 
 urlpatterns = [
     path(
@@ -11,5 +15,10 @@ urlpatterns = [
         "retrieve/<uuid:pk>/",
         RetrieveDoctorView.as_view(),
         name="retrieve-doctor",
+    ),
+    path(
+        "<uuid:doctor_id>/slots/",
+        ListDoctorTimeSlotView.as_view(),
+        name="doctor-slots",
     ),
 ]

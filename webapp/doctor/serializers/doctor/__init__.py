@@ -6,8 +6,10 @@ from doctor.serializers.doctor.retrieve import (
     RetrieveDoctorSerializer,
 )
 
+from doctor.serializers.doctor.slot import TimeSlotSerializer
 
 __all__ = [
     "ListDoctorSerializer",
     "RetrieveDoctorSerializer",
+    "TimeSlotSerializer",
 ]
