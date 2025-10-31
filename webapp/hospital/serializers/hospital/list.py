@@ -1,9 +1,8 @@
-from rest_framework import serializers
-
+from rest_framework import serializers  # noqa
 from hospital.models import Hospital
 
 
-class ListHospitalSerializer(serializers.Serializer):
+class ListHospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital
         fields = "__all__"
