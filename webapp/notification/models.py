@@ -1,9 +1,10 @@
 from django.db import models
 
+from base.models import BaseModel
 from gatekeeper.models import User
 
 
-class Notification(models.Model):
+class Notification(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="notifications"
     )

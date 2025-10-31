@@ -1,9 +1,11 @@
+from base.models import BaseModel  # noqa
+
 from django.db import models
 
 from gatekeeper.models import User
 
 
-class Hospital(models.Model):
+class Hospital(BaseModel):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="hospital_profile"
     )

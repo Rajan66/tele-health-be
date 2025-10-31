@@ -1,8 +1,9 @@
-from django.db import models
+from django.db import models  # noqa
+from base.models import BaseModel
 from doctor.models.doctor import Doctor
 
 
-class TimeSlot(models.Model):
+class TimeSlot(BaseModel):
     doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name="slots"
     )

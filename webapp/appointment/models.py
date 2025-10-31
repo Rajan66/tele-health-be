@@ -1,3 +1,5 @@
+from base.models import BaseModel  # noqa
+
 from django.db import models
 
 from doctor.models import Doctor
@@ -5,7 +7,7 @@ from worker.models import HealthWorker
 from hospital.models import Hospital
 
 
-class Appointment(models.Model):
+class Appointment(BaseModel):
     STATUS_CHOICES = [
         ("scheduled", "Scheduled"),
         ("ongoing", "Ongoing"),
