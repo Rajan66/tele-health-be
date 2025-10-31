@@ -1,3 +1,6 @@
-from django.contrib import admin
+from django.contrib import admin  # noqa
 
-# Register your models here.
+from hospital.models import Hospital, Department
+
+admin.site.register(Hospital)
+admin.site.register(Department)
