@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from .models import Report
 from gatekeeper.serializers import RetrieveMeSerializer
-from doctor.serializers.doctor import RetrieveDoctorSerializer
+from doctor.serializers.doctor import (
+    RetrieveNanoDoctorSerializer,
+)
 
 
 class CreateReportSerializer(serializers.ModelSerializer):
@@ -12,7 +14,7 @@ class CreateReportSerializer(serializers.ModelSerializer):
 
 
 class ListReportSerializer(serializers.ModelSerializer):
-    doctor = RetrieveDoctorSerializer()
+    doctor = RetrieveNanoDoctorSerializer()
 
     created_by = RetrieveMeSerializer()
 

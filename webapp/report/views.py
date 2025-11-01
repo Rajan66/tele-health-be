@@ -6,7 +6,6 @@ from report.serializers import (
     ListReportSerializer,
     RetrieveReportSerializer,
 )
-from doctor.serializers.doctor import RetrieveNanoDoctorSerializer
 
 
 class ReportCreateAPIView(generics.CreateAPIView):
@@ -48,7 +47,7 @@ class ReportRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class ReportListByPatientAPIView(generics.ListAPIView):
-    serializer_class = RetrieveNanoDoctorSerializer
+    serializer_class = RetrieveReportSerializer
 
     def get_queryset(self):
         patient_id = self.kwargs.get("patient_id")
