@@ -23,8 +23,6 @@ class RetrieveNanoDoctorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "user",
-            "diagnosis",
-            "prescription",
             "created_at",
             "updated_at",
         )
