@@ -29,6 +29,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Clear existing patients
         Patient.objects.all().delete()
+        self.stdout.write(
+            self.style.WARNING("🗑 Cleared all existing patients")
+        )
 
         # Get all health worker users
         health_workers = User.objects.filter(role="health_worker")
@@ -40,7 +43,7 @@ class Command(BaseCommand):
             )
             return
 
-        for _ in range(20):  # create 20 patients
+        for _ in range(200):  # create 200 patients
             creator = random.choice(health_workers)
             patient = Patient.objects.create(
                 first_name=random.choice(first_names),
@@ -50,8 +53,9 @@ class Command(BaseCommand):
                 gender=random.choice(genders),
                 blood_group=random.choice(blood_groups),
                 weight=round(random.uniform(40, 100), 1),
-                blood_pressure=f"{random.randint(
-                    90, 140)}/{random.randint(60, 90)}",
+                blood_pressure=f"{random.randint(90, 140)}/{
+                    random.randint(60, 90)
+                }",
                 address=random.choice(villages),
                 created_by=creator,
             )
@@ -59,7 +63,12 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(
                     f"✅ Created patient: {patient.first_name} {
-                        patient.last_name} "
+                        patient.last_name
+                    } "
                     f"({patient.address}) by {creator.email}"
                 )
             )
+
+        self.stdout.write(
+            self.style.SUCCESS("🎉 Successfully seeded 200 patients!")
+        )
