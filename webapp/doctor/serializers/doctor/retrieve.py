@@ -13,3 +13,18 @@ class RetrieveDoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = "__all__"
+
+
+class RetrieveNanoDoctorSerializer(serializers.ModelSerializer):
+    user = RetrieveMeSerializer()
+
+    class Meta:
+        model = Doctor
+        fields = (
+            "id",
+            "user",
+            "diagnosis",
+            "prescription",
+            "created_at",
+            "updated_at",
+        )
