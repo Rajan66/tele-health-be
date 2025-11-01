@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from appointment.models import Appointment
 from notification.models import Notification
+from doctor.models import TimeSlot
 import uuid
 
 
@@ -29,14 +30,12 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
         if not getattr(obj, "room_id", None):
             return None
         frontend_url = "http://localhost:3000/meeting"
-        return f"{frontend_url}?room_id={obj.room_id}"
+        return f"{frontend_url}/{obj.room_id}"
 
     def create(self, validated_data):
         request = self.context["request"]
-
         health_worker = request.user.health_worker_profile
 
-        # generate room id
         room_id = str(uuid.uuid4())
 
         appointment = Appointment.objects.create(
@@ -44,13 +43,21 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
-        # set meeting link
-        appointment.meeting_link = (
-            f"http://localhost:3000/meeting?room_id={room_id}"
-        )
+        appointment.meeting_link = f"http://localhost:3000/meeting/{room_id}"
         appointment.save()
 
-        # create notification
+        doctor = appointment.doctor
+        start_time = appointment.start_time
+
+        try:
+            slot = TimeSlot.objects.get(
+                doctor=doctor, start_time=start_time, is_booked=False
+            )
+            slot.is_booked = True
+            slot.save()
+        except TimeSlot.DoesNotExist:
+            pass
+
         Notification.objects.create(
             doctor=appointment.doctor.user,
             health_worker=request.user,

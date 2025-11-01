@@ -61,21 +61,21 @@ class Command(BaseCommand):
             email = f"hw{i + 1}@example.com"
             first_name = first_names[i]
             area = random.choice(village_areas)
-            user = User.objects.create(
+            user = User.objects.create_user(
                 email=email,
+                password="admin",
                 role="health_worker",
                 first_name=first_name,
                 last_name=last_name,
             )
-            # Set password (optional: hashed using set_password)
-            user.set_password("defaultpassword123")
-            user.save()
 
             health_worker = HealthWorker.objects.create(
                 user=user,
                 contact=f"98000000{i + 1:02}",
                 area=area,
             )
+            health_worker.save()
+
             self.stdout.write(
                 self.style.SUCCESS(f"✅ Created {user.email} in {area}")
             )
