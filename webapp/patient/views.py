@@ -14,7 +14,7 @@ class CreatePatientView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save()
+        serializer.save(created_by=self.request.user)
 
 
 class ListPatientView(generics.ListAPIView):
@@ -23,13 +23,7 @@ class ListPatientView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if hasattr(user, "doctor_profile"):
-            return Patient.objects.filter(doctor=user.doctor_profile)
-        elif hasattr(user, "health_worker_profile"):
-            return Patient.objects.filter(
-                health_worker=user.health_worker_profile
-            )
-        return Patient.objects.none()
+        return Patient.objects.filter(created_by=user)
 
 
 class RetrievePatientView(generics.RetrieveAPIView):
@@ -39,10 +33,4 @@ class RetrievePatientView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if hasattr(user, "doctor_profile"):
-            return Patient.objects.filter(doctor=user.doctor_profile)
-        elif hasattr(user, "health_worker_profile"):
-            return Patient.objects.filter(
-                health_worker=user.health_worker_profile
-            )
-        return Patient.objects.none()
+        return Patient.objects.filter(created_by=user)

@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Report
@@ -21,16 +19,38 @@ class ReportCreateAPIView(generics.CreateAPIView):
 
 
 class ReportListAPIView(generics.ListAPIView):
-    queryset = Report.objects.all().order_by("-report_date")
     serializer_class = ListReportSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+
+        if hasattr(user, "doctor_profile"):
+            return Report.objects.filter(doctor=user.doctor_profile).order_by(
+                "-report_date"
+            )
+        elif hasattr(user, "health_worker_profile"):
+            return Report.objects.filter(
+                patient__health_worker=user.health_worker_profile
+            ).order_by("-report_date")
+        return Report.objects.none()
+
 
 class ReportRetrieveAPIView(generics.RetrieveAPIView):
-    queryset = Report.objects.all()
     serializer_class = RetrieveReportSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "id"
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if hasattr(user, "doctor_profile"):
+            return Report.objects.filter(doctor=user.doctor_profile)
+        elif hasattr(user, "health_worker_profile"):
+            return Report.objects.filter(
+                patient__health_worker=user.health_worker_profile
+            )
+        return Report.objects.none()
 
 
 class ReportUpdateAPIView(generics.UpdateAPIView):

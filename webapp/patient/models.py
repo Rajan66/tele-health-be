@@ -25,5 +25,14 @@ class Patient(BaseModel):
 
     blood_pressure = models.CharField(max_length=15)
 
-    def __str__(self):
-        return f"{self.user.username} ({self.role.name})"
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patients_created",
+    )
+
+
+def __str__(self):
+    return f"{self.user.username} ({self.role.name})"
