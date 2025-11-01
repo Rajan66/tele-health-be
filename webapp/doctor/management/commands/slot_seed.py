@@ -35,7 +35,7 @@ class Command(BaseCommand):
             return
 
         today = date.today()
-        days_to_seed = 7  # or 30 if you want a month
+        days_to_seed = 3  # or 30 if you want a month
 
         for doctor in doctors:
             for day_offset in range(days_to_seed):
@@ -56,8 +56,9 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✅ Slots created for {
-                        doctor.user.email} ({days_to_seed} days)"
+                    f"✅ Slots created for {doctor.user.email} ({
+                        days_to_seed
+                    } days)"
                 )
             )
 
