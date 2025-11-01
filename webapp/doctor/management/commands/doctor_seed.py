@@ -1,6 +1,10 @@
-# management/commands/seed_doctors.py
+import random
+import os
+from io import BytesIO
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
+from django.conf import settings
 
 from gatekeeper.models import User
 from doctor.models import Doctor
@@ -8,88 +12,134 @@ from hospital.models import Department
 
 
 class Command(BaseCommand):
-    help = "Seed doctors for every existing department (default password)"
-    DEFAULT_PASSWORD = "admin123"  # <-- change in prod if you want
+    help = "Seed ~100 doctors distributed across departments and hospitals with sequential images"
+
+    DEFAULT_PASSWORD = "admin123"
 
     def handle(self, *args, **options):
-        # --------------------------------------------------------------
-        # 1. Clean old data
-        # --------------------------------------------------------------
-        Doctor.objects.all().delete()  # cascades → User is deleted too
+        # Clear old doctors & users
+        Doctor.objects.all().delete()
+        User.objects.filter(role="doctor").delete()
         self.stdout.write(
-            self.style.WARNING(
-                "Cleared all existing doctors (and their users)"
-            )
+            self.style.WARNING("🗑 Cleared existing doctors and users")
         )
 
-        # --------------------------------------------------------------
-        # 2. Make sure we have departments
-        # --------------------------------------------------------------
         departments = Department.objects.select_related("hospital").all()
         if not departments.exists():
             self.stdout.write(
                 self.style.ERROR(
-                    "No departments found! Run `seed_hospitals` and "
-                    "`seed_departments` first."
+                    "❌ No departments found! Seed hospitals & departments first."
                 )
             )
             return
 
-        # --------------------------------------------------------------
-        # 3. Sample doctor names
-        # --------------------------------------------------------------
-        sample_doctors = [
-            {"first_name": "Ramesh", "last_name": "Shrestha"},
-            {"first_name": "Sita", "last_name": "Koirala"},
-            {"first_name": "Bikash", "last_name": "Lama"},
-            {"first_name": "Manisha", "last_name": "Thapa"},
-            {"first_name": "Prakash", "last_name": "Bhandari"},
+        first_names = [
+            "Ramesh",
+            "Sita",
+            "Bikash",
+            "Manisha",
+            "Prakash",
+            "Sunita",
+            "Kiran",
+            "Nirmala",
+            "Dipesh",
+            "Laxmi",
+            "Bishal",
+            "Sarita",
+            "Rajesh",
+            "Anita",
+            "Suman",
+            "Pushpa",
+            "Roshan",
+            "Bhawana",
+            "Raju",
+            "Rekha",
+            "Dinesh",
+            "Keshav",
+            "Puja",
+            "Kamal",
+            "Asha",
+            "Narayan",
+            "Sanjay",
+            "Mina",
+            "Buddhi",
+            "Krishna",
+        ]
+        last_names = [
+            "Shrestha",
+            "Koirala",
+            "Lama",
+            "Thapa",
+            "Bhandari",
+            "KC",
+            "Adhikari",
+            "Maharjan",
+            "Basnet",
+            "Rai",
+            "Tamang",
+            "Gurung",
+            "Bhattarai",
+            "Poudel",
+            "Nepal",
+            "Dahal",
+            "Pandey",
+            "Shah",
+            "Karki",
+            "Malla",
         ]
 
-        # --------------------------------------------------------------
-        # 4. Create doctors
-        # --------------------------------------------------------------
+        image_dir = os.path.join(settings.BASE_DIR, "doctor_images")
+        if not os.path.exists(image_dir):
+            self.stdout.write(
+                self.style.ERROR(f"❌ Image folder not found: {image_dir}")
+            )
+            return
+
         created_count = 0
-        for dept in departments:
+        for i in range(1, 101):  # 100 doctors
+            dept = random.choice(departments)
+            first = random.choice(first_names)
+            last = random.choice(last_names)
             hospital_slug = slugify(dept.hospital.name)
-            dept_slug = slugify(dept.name)
+            email = f"{first.lower()}.{last.lower()}@{hospital_slug}.com"
 
-            for doc in sample_doctors:
-                # ---- e-mail -------------------------------------------------
-                email = (
-                    f"{doc['first_name'].lower()}.{dept_slug}"
-                    f"@{hospital_slug}.com"
-                )
+            user = User.objects.create_user(
+                email=email,
+                password=self.DEFAULT_PASSWORD,
+                first_name=first,
+                last_name=last,
+                role="doctor",
+            )
 
-                # ---- User (hashed password) --------------------------------
-                user = User.objects.create_user(
-                    email=email,
-                    password=self.DEFAULT_PASSWORD,
-                    first_name=doc["first_name"],
-                    last_name=doc["last_name"],
-                    role="doctor",
-                )
+            # Sequential image
+            image_filename = f"doctor_{i}.png"
+            image_path = os.path.join(image_dir, image_filename)
+            if os.path.exists(image_path):
+                with open(image_path, "rb") as f:
+                    doctor_image = File(BytesIO(f.read()), name=image_filename)
+            else:
+                doctor_image = None
 
-                # ---- Doctor profile ----------------------------------------
-                Doctor.objects.create(
-                    user=user,
-                    department=dept,
-                    contact="9800000000",  # you can randomise later
-                    experience_years=0,
-                    is_available=True,
-                )
+            Doctor.objects.create(
+                user=user,
+                department=dept,
+                contact=f"98{random.randint(10000000, 99999999)}",
+                experience_years=random.randint(1, 20),
+                is_available=random.choice([True, True, False]),
+                image=doctor_image,
+            )
 
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"Created Dr. {user.get_full_name()} "
-                        f"({dept.name} – {dept.hospital.name}) | "
-                        f"Login: {email} / {self.DEFAULT_PASSWORD}"
-                    )
+            created_count += 1
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"✅ Dr. {first} {last} ({dept.name}, {
+                        dept.hospital.name
+                    }) - {email}"
                 )
-                created_count += 1
+            )
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Doctors seeded successfully! ({created_count} created)"
+                f"🎉 Successfully seeded {created_count} doctors!"
             )
         )

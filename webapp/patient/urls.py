@@ -12,7 +12,7 @@ urlpatterns = [
         name="create-patient",
     ),
     path(
-        "list",
+        "list/",
         ListPatientView.as_view(),
         name="list-patient",
     ),

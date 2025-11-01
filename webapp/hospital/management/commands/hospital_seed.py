@@ -1,5 +1,4 @@
 import os
-import zipfile
 from io import BytesIO
 
 from django.core.files import File
@@ -7,77 +6,143 @@ from django.core.management.base import BaseCommand
 from gatekeeper.models import User
 from hospital.models import Hospital
 
-# __file__ = .../webapp/hospital/management/commands/seed_hospitals.py
-# We go up three directories to reach webapp/
-WEBAPP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-ZIP_PATH = os.path.join(WEBAPP_DIR, "Hospitals.zip")
-
-
 
 class Command(BaseCommand):
-    help = "Seed default hospitals with images from ZIP"
+    help = (
+        "Seed 10 government hospitals with images from webapp/hospital_images/"
+    )
 
     def handle(self, *args, **options):
-        # Clear old hospitals and hospital users
-        Hospital.objects.all().delete()
-        User.objects.filter(role="hospital").delete()
+        # 🔹 Path setup
+        BASE_DIR = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../..")
+        )
+        IMAGE_DIR = os.path.join(BASE_DIR, "hospital_images")
 
-        hospital_data = [
-            {"name": "City Hospital", "email": "cityhospital@gmail.com", "contact": "9812345678", "address": "Kathmandu", "image_name": "city_hospital.png"},
-            {"name": "Metro Care Hospital", "email": "metrocare@gmail.com", "contact": "9801234567", "address": "Lalitpur", "image_name": "metro_care_hospital.jpg"},
-            {"name": "Bir Hospital", "email": "birhospital@gmail.com", "contact": "9841239876", "address": "Kathmandu", "image_name": "bir_hospital.jpg"},
-            {"name": "Bharosa Medical Center", "email": "bharosa@gmail.com", "contact": "9867775544", "address": "Pokhara", "image_name": "bharosa_medical_center.jpg"},
-        ]
-
-        if not os.path.exists(ZIP_PATH):
-            self.stdout.write(self.style.ERROR(f"❌ ZIP file not found at {ZIP_PATH}"))
+        if not os.path.exists(IMAGE_DIR):
+            self.stdout.write(
+                self.style.ERROR(f"❌ Image folder not found: {IMAGE_DIR}")
+            )
             return
 
-        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_file:
-            zip_files = zip_file.namelist()
+        # 🔹 Wipe old data
+        Hospital.objects.all().delete()
+        User.objects.filter(role="hospital").delete()
+        self.stdout.write(
+            self.style.WARNING("🗑️ Cleared old hospitals and hospital users")
+        )
 
-            for data in hospital_data:
-                # Create User
-                user, _ = User.objects.get_or_create(
-                    email=data["email"],
-                    defaults={
-                        "first_name": data["name"].split()[0],
-                        "last_name": data["name"].split()[-1],
-                        "role": "hospital",
-                        "password": "admin1234",
-                    },
-                )
+        # 🔹 List of 10 government hospitals
+        hospitals = [
+            {
+                "name": "APF Hospital Balambu",
+                "email": "apfbalambu@gmail.com",
+                "contact": "9811111111",
+                "address": "Balambu, Kathmandu",
+                "image": "apf_hospital_balambu.jpg",
+            },
+            {
+                "name": "Bir Hospital",
+                "email": "birhospital@gmail.com",
+                "contact": "9811111112",
+                "address": "Kathmandu",
+                "image": "bir hospital.jpg",
+            },
+            {
+                "name": "Civil Hospital",
+                "email": "civilhospital@gmail.com",
+                "contact": "9811111113",
+                "address": "Kathmandu",
+                "image": "civil.png",
+            },
+            {
+                "name": "Narayani Provincial Hospital",
+                "email": "narayani@gmail.com",
+                "contact": "9811111114",
+                "address": "Birgunj",
+                "image": "narayani_provincal_hospital.jpg",
+            },
+            {
+                "name": "Palpa Hospital",
+                "email": "palpahospital@gmail.com",
+                "contact": "9811111115",
+                "address": "Palpa",
+                "image": "palpa_hospital.jpg",
+            },
+            {
+                "name": "Paropakar Maternity and Women Hospital",
+                "email": "paropakar@gmail.com",
+                "contact": "9811111116",
+                "address": "Thapathali, Kathmandu",
+                "image": "paropakar_maternity_and_women hospital.JPG",
+            },
+            {
+                "name": "Pashupati Homeopathic Hospital",
+                "email": "pashupatihomeo@gmail.com",
+                "contact": "9811111117",
+                "address": "Gaushala, Kathmandu",
+                "image": "pashupati_homeopathic_hospital.jpg",
+            },
+            {
+                "name": "Patan Academy of Health Science",
+                "email": "patanacademy@gmail.com",
+                "contact": "9811111118",
+                "address": "Lalitpur",
+                "image": "patan_academic_of_health_science.jpg",
+            },
+            {
+                "name": "Shahid Gangalal National Heart Center",
+                "email": "gangalalheart@gmail.com",
+                "contact": "9811111119",
+                "address": "Bansbari, Kathmandu",
+                "image": "shadhi_gangalal_national_heart_center.jpg",
+            },
+            {
+                "name": "Tri Chandra Military Hospital",
+                "email": "trichandra@gmail.com",
+                "contact": "9811111120",
+                "address": "Kathmandu",
+                "image": "tri_chandra_military.jpg",
+            },
+        ]
 
-                # Create Hospital
-                hospital, created = Hospital.objects.get_or_create(
-                    user=user,
-                    defaults={
-                        "name": data["name"],
-                        "contact": data["contact"],
-                        "address": data["address"],
-                    },
-                )
+        for data in hospitals:
+            # Create user
+            user = User.objects.create_user(
+                email=data["email"],
+                password="admin1234",
+                first_name=data["name"].split()[0],
+                last_name=data["name"].split()[-1],
+                role="hospital",
+            )
 
-                # Auto-match image from ZIP
-                expected_image_name_jpg = f"{data['name'].lower().replace(' ', '_')}.jpg"
-                expected_image_name_png = f"{data['name'].lower().replace(' ', '_')}.png"
+            # Create hospital
+            hospital = Hospital.objects.create(
+                user=user,
+                name=data["name"],
+                contact=data["contact"],
+                address=data["address"],
+            )
 
-                image_name = None
-                if expected_image_name_jpg in zip_files:
-                    image_name = expected_image_name_jpg
-                elif expected_image_name_png in zip_files:
-                    image_name = expected_image_name_png
-
-                if image_name:
-                    image_data = zip_file.read(image_name)
+            # Add image
+            image_path = os.path.join(IMAGE_DIR, data["image"])
+            if os.path.exists(image_path):
+                with open(image_path, "rb") as f:
                     hospital.image.save(
-                        image_name, File(BytesIO(image_data)), save=True
+                        os.path.basename(image_path),
+                        File(BytesIO(f.read())),
+                        save=True,
                     )
-                    self.stdout.write(self.style.SUCCESS(f"🖼️ Added image for {hospital.name}"))
-                else:
-                    self.stdout.write(self.style.WARNING(f"⚠️ No image found for {hospital.name}"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"🖼️ Added image for {hospital.name}")
+                )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"⚠️ Image not found: {data['image']}")
+                )
 
-                if created:
-                    self.stdout.write(self.style.SUCCESS(f"✅ Created hospital: {hospital.name}"))
-                else:
-                    self.stdout.write(f"⚠️ Hospital already exists: {hospital.name}")
+        self.stdout.write(
+            self.style.SUCCESS(
+                "✅ Successfully seeded 10 government hospitals!"
+            )
+        )
