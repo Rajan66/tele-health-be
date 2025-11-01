@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Report
+from gatekeeper.serializers import RetrieveMeSerializer
+from doctor.serializers.doctor import RetrieveDoctorSerializer
 
 
 class CreateReportSerializer(serializers.ModelSerializer):
@@ -10,6 +12,10 @@ class CreateReportSerializer(serializers.ModelSerializer):
 
 
 class ListReportSerializer(serializers.ModelSerializer):
+    doctor = RetrieveDoctorSerializer()
+
+    created_by = RetrieveMeSerializer()
+
     class Meta:
         model = Report
         fields = "__all__"
