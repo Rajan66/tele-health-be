@@ -5,7 +5,7 @@ from hospital.serializers.hospital import RetrieveHospitalSerializer
 
 
 class RetrieveDepartmentSerializer(serializers.ModelSerializer):
-    hospital = RetrieveHospitalSerializer
+    hospital = RetrieveHospitalSerializer()
 
     class Meta:
         model = Department
