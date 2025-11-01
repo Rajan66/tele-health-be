@@ -39,18 +39,24 @@ class ReportListAPIView(generics.ListAPIView):
 class ReportRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = RetrieveReportSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "id"
+    lookup_field = "patient_id"
 
-    def get_queryset(self):
+    def get_object(self):
         user = self.request.user
+        patient_id = self.kwargs.get(self.lookup_field)
+
+        queryset = Report.objects.none()
 
         if hasattr(user, "doctor_profile"):
-            return Report.objects.filter(doctor=user.doctor_profile)
+            queryset = Report.objects.filter(doctor=user.doctor_profile)
         elif hasattr(user, "health_worker_profile"):
-            return Report.objects.filter(
+            queryset = Report.objects.filter(
                 patient__health_worker=user.health_worker_profile
             )
-        return Report.objects.none()
+
+        # Filter by patient_id
+        obj = generics.get_object_or_404(queryset, patient_id=patient_id)
+        return obj
 
 
 class ReportUpdateAPIView(generics.UpdateAPIView):
