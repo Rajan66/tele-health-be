@@ -1,5 +1,5 @@
 from django.urls import path  # noqa
-from doctor.views import (
+from patient.views import (
     CreatePatientView,
     ListPatientView,
     RetrievePatientView,

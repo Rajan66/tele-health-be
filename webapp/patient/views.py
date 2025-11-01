@@ -25,7 +25,7 @@ class ListPatientView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class RetrieveAPIView(generics.RetrieveAPIView):
+class RetrievePatientView(generics.RetrieveAPIView):
     queryset = Patient.objects.all()
     serializer_class = RetrievePatientSerializer
     permission_classes = [IsAuthenticated]
