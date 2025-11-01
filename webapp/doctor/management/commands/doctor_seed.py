@@ -12,9 +12,10 @@ from hospital.models import Department
 
 
 class Command(BaseCommand):
-    help = "Seed ~100 doctors distributed across departments and hospitals with sequential images"
+    help = "Seed doctors per department per hospital (max 300 total)"
 
     DEFAULT_PASSWORD = "admin123"
+    MAX_DOCTORS = 300
 
     def handle(self, *args, **options):
         # Clear old doctors & users
@@ -89,54 +90,84 @@ class Command(BaseCommand):
         ]
 
         image_dir = os.path.join(settings.BASE_DIR, "doctor_images")
-        if not os.path.exists(image_dir):
+        image_files = sorted(
+            [
+                os.path.join(image_dir, f)
+                for f in os.listdir(image_dir)
+                if f.lower().endswith((".jpg", ".jpeg", ".png"))
+            ]
+        )
+
+        if not os.path.exists(image_dir) or not image_files:
             self.stdout.write(
-                self.style.ERROR(f"❌ Image folder not found: {image_dir}")
-            )
-            return
-
-        created_count = 0
-        for i in range(1, 101):  # 100 doctors
-            dept = random.choice(departments)
-            first = random.choice(first_names)
-            last = random.choice(last_names)
-            hospital_slug = slugify(dept.hospital.name)
-            email = f"{first.lower()}.{last.lower()}@{hospital_slug}.com"
-
-            user = User.objects.create_user(
-                email=email,
-                password=self.DEFAULT_PASSWORD,
-                first_name=first,
-                last_name=last,
-                role="doctor",
-            )
-
-            # Sequential image
-            image_filename = f"doctor_{i}.png"
-            image_path = os.path.join(image_dir, image_filename)
-            if os.path.exists(image_path):
-                with open(image_path, "rb") as f:
-                    doctor_image = File(BytesIO(f.read()), name=image_filename)
-            else:
-                doctor_image = None
-
-            Doctor.objects.create(
-                user=user,
-                department=dept,
-                contact=f"98{random.randint(10000000, 99999999)}",
-                experience_years=random.randint(1, 20),
-                is_available=random.choice([True, True, False]),
-                image=doctor_image,
-            )
-
-            created_count += 1
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"✅ Dr. {first} {last} ({dept.name}, {
-                        dept.hospital.name
-                    }) - {email}"
+                self.style.WARNING(
+                    "⚠️ Doctor images missing, will create without images."
                 )
             )
+            image_files = []
+
+        email_counter = {}  # To avoid duplicate emails
+        created_count = 0
+        image_index = 0
+
+        for dept in departments:
+            if created_count >= self.MAX_DOCTORS:
+                break
+
+            num_doctors = random.randint(1, 5)  # assign 1-5 doctors per dept
+            for _ in range(num_doctors):
+                if created_count >= self.MAX_DOCTORS:
+                    break
+
+                first = random.choice(first_names)
+                last = random.choice(last_names)
+                hospital_slug = slugify(dept.hospital.name)
+
+                base_email = (
+                    f"{first.lower()}.{last.lower()}@{hospital_slug}.com"
+                )
+                count = email_counter.get(base_email, 0)
+                email_counter[base_email] = count + 1
+                email = (
+                    base_email
+                    if count == 0
+                    else f"{first.lower()}.{last.lower()}{count}@{hospital_slug}.com"
+                )
+
+                user = User.objects.create_user(
+                    email=email,
+                    password=self.DEFAULT_PASSWORD,
+                    first_name=first,
+                    last_name=last,
+                    role="doctor",
+                )
+
+                doctor_image = None
+                if image_files:
+                    image_path = image_files[image_index % len(image_files)]
+                    image_index += 1
+                    with open(image_path, "rb") as f:
+                        doctor_image = File(
+                            BytesIO(f.read()),
+                            name=os.path.basename(image_path),
+                        )
+
+                Doctor.objects.create(
+                    user=user,
+                    department=dept,
+                    contact=f"98{random.randint(10000000, 99999999)}",
+                    experience_years=random.randint(1, 20),
+                    is_available=random.choice([True, True, False]),
+                    image=doctor_image,
+                )
+
+                created_count += 1
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"✅ Dr. {first} {last} ({dept.name}, {
+                            dept.hospital.name}) - {email}"
+                    )
+                )
 
         self.stdout.write(
             self.style.SUCCESS(
