@@ -23,6 +23,9 @@ class ListPatientView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
+
+        if user.is_superuser:
+            return Patient.objects.all()
         return Patient.objects.filter(created_by=user)
 
 

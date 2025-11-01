@@ -14,7 +14,6 @@ class ReportCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Save the logged-in user as creator
         serializer.save(created_by=self.request.user)
 
 
@@ -49,3 +48,13 @@ class ReportRetrieveAPIView(generics.RetrieveAPIView):
         elif hasattr(user, "health_worker_profile"):
             return Report.objects.filter(created_by=user)
         return Report.objects.none()
+
+
+class ReportListByPatientAPIView(generics.ListAPIView):
+    serializer_class = ListReportSerializer
+
+    def get_queryset(self):
+        patient_id = self.kwargs.get("patient_id")
+        return Report.objects.filter(patient_id=patient_id).order_by(
+            "-report_date"
+        )

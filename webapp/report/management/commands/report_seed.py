@@ -76,7 +76,8 @@ class Command(BaseCommand):
                     self.style.SUCCESS(
                         f"Created report for {patient.first_name} {
                             patient.last_name
-                        } by {created_by.email} with doctor {
+                        } "
+                        f"by {created_by.email} with doctor {
                             doctor.user.email
                         }"
                     )
