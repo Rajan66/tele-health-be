@@ -43,6 +43,9 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
+        appointment.meeting_link = f"http://localhost:3000/meeting/{room_id}"
+        appointment.save()
+
         doctor = appointment.doctor
         start_time = appointment.start_time
 
