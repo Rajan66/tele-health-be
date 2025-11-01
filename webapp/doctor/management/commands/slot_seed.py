@@ -1,10 +1,11 @@
+import random
 from datetime import datetime, date, time, timedelta
 from django.core.management.base import BaseCommand
 from doctor.models import Doctor, TimeSlot
 
 
 class Command(BaseCommand):
-    help = "Seed time slots for all doctors for the next 30 days"
+    help = "Seed time slots for all doctors for the next 7 days (50% booked)"
 
     def handle(self, *args, **options):
         TimeSlot.objects.all().delete()
@@ -34,7 +35,7 @@ class Command(BaseCommand):
             return
 
         today = date.today()
-        days_to_seed = 7
+        days_to_seed = 7  # or 30 if you want a month
 
         for doctor in doctors:
             for day_offset in range(days_to_seed):
@@ -43,15 +44,20 @@ class Command(BaseCommand):
                     start_dt = datetime.combine(current_day, start)
                     end_dt = datetime.combine(current_day, end)
 
+                    # Randomly mark ~50% as booked
+                    is_booked = random.random() < 0.5
+
                     TimeSlot.objects.get_or_create(
                         doctor=doctor,
                         start_time=start_dt,
                         end_time=end_dt,
+                        defaults={"is_booked": is_booked},
                     )
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✅ Slots created for {doctor.user.email} for 7 days"
+                    f"✅ Slots created for {
+                        doctor.user.email} ({days_to_seed} days)"
                 )
             )
 

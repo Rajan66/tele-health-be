@@ -4,6 +4,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from gatekeeper.views.zego import ZegoTokenAPIView
+
 urlpatterns = [
     path(
         "",
@@ -14,5 +16,10 @@ urlpatterns = [
         "refresh/",
         TokenRefreshView.as_view(),
         name="refresh_token",
+    ),
+    path(
+        "zego/",
+        ZegoTokenAPIView.as_view(),
+        name="zego_token",
     ),
 ]
