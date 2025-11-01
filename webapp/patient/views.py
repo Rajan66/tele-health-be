@@ -26,6 +26,8 @@ class ListPatientView(generics.ListAPIView):
 
         if user.is_superuser:
             return Patient.objects.all()
+        if user.role == "doctor":
+            return Patient.objects.all().reverse()
         return Patient.objects.filter(created_by=user)
 
 
