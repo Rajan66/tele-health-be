@@ -2,6 +2,7 @@ from django.db import models
 from base.models import BaseModel
 from patient.models import Patient
 from doctor.models.doctor import Doctor
+from worker.models import HealthWorker
 from gatekeeper.models.user import User
 
 
@@ -24,4 +25,4 @@ class Report(BaseModel):
     report_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Report for {self.patient.user.email} on {self.report_date}"
+        return f"Report for {self.patient.first_name} on {self.report_date}"

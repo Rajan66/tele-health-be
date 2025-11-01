@@ -1,6 +1,7 @@
 from django.db import models
 from gatekeeper.models import User
 from base.models import BaseModel
+from worker.models import HealthWorker
 
 
 class Patient(BaseModel):
@@ -35,4 +36,4 @@ class Patient(BaseModel):
 
 
 def __str__(self):
-    return f"{self.user.username} ({self.role.name})"
+    return f"{self.first_name} ({self.last_name})"

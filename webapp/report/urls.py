@@ -3,7 +3,6 @@ from .views import (
     ReportCreateAPIView,
     ReportListAPIView,
     ReportRetrieveAPIView,
-    ReportUpdateAPIView,
 )
 
 urlpatterns = [
@@ -13,10 +12,5 @@ urlpatterns = [
         "retrieve/<uuid:patient_id>/",
         ReportRetrieveAPIView.as_view(),
         name="report-retrieve",
-    ),
-    path(
-        "<uuid:pk>/update/",
-        ReportUpdateAPIView.as_view(),
-        name="report-update",
     ),
 ]
