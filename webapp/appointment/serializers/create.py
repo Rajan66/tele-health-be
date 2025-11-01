@@ -58,12 +58,14 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
         except TimeSlot.DoesNotExist:
             pass
 
+        formatted_date_time = datetime.strptime(appointment.start_time, "%Y-%m-%d %H:%M:%S")
+
+        formatted_str = formatted_date_time.strftime("%b %d, %I:%M%p").lower() 
+        
         Notification.objects.create(
             doctor=appointment.doctor.user,
             health_worker=request.user,
-            message=f"New appointment booked by {
-                request.user.email
-            }. Here's the meeting link: {appointment.meeting_link}",
+            message=f"New appointment booked by {request.user.email} for {formatted_str} {appointment.meeting_link}",
         )
 
         return appointment
