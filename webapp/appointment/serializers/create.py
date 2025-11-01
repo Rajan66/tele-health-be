@@ -43,9 +43,6 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
-        appointment.meeting_link = f"http://localhost:3000/meeting/{room_id}"
-        appointment.save()
-
         doctor = appointment.doctor
         start_time = appointment.start_time
 
@@ -58,14 +55,13 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
         except TimeSlot.DoesNotExist:
             pass
 
-        formatted_date_time = datetime.strptime(appointment.start_time, "%Y-%m-%d %H:%M:%S")
+        formatted_str = start_time.strftime("%b %d, %I:%M%p").lower()
 
-        formatted_str = formatted_date_time.strftime("%b %d, %I:%M%p").lower() 
-        
         Notification.objects.create(
-            doctor=appointment.doctor.user,
+            doctor=doctor.user,
             health_worker=request.user,
-            message=f"New appointment booked by {request.user.email} for {formatted_str} {appointment.meeting_link}",
+            message=f"New appointment booked by {request.user.email} for {formatted_str}.",  # noqa
+            meeting_link={appointment.meeting_link},
         )
 
         return appointment

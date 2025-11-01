@@ -21,6 +21,7 @@ class Notification(BaseModel):
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    meeting_link = models.URLField(null=True, blank=True)
 
     def __str__(self):
         target = (
