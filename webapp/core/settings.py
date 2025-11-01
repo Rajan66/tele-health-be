@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "hospital",
     "notification",
     "worker",
+    "patient",
+    "report",
 ]
 
 MIDDLEWARE = [
