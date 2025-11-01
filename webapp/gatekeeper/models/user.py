@@ -11,6 +11,7 @@ class User(AbstractUser, BaseModel):
     ROLE_CHOICES = [
         ("hospital", "Hospital"),
         ("doctor", "Doctor"),
+        ("patient", "Patient"),
         ("health_worker", "Health Worker"),
         ("super_admin", "Super Admin"),
     ]

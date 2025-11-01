@@ -92,4 +92,4 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+#/webapp/*_images/

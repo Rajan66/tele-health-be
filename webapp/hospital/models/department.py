@@ -10,6 +10,11 @@ class Department(BaseModel):
     hospital = models.ForeignKey(
         Hospital, on_delete=models.CASCADE, related_name="departments"
     )
+    image = models.ImageField(
+        upload_to="department_images/",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.name} ({self.hospital.name})"

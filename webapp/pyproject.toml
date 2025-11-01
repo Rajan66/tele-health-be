@@ -17,6 +17,7 @@ dependencies = [
     "drf-spectacular>=0.28.0",
     "drf-spectacular-sidecar>=2025.10.1",
     "pillow>=12.0.0",
+    "pycryptodome>=3.23.0",
 ]
 
 [dependency-groups]

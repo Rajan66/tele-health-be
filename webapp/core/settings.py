@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta  # noqa
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -17,7 +17,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Application definition
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     "hospital",
     "notification",
     "worker",
+    "patient",
+    "report",
 ]
 
 MIDDLEWARE = [
@@ -96,9 +102,10 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PAGINATION_CLASS": (
-        "rest_framework.pagination.PageNumberPagination",
-    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",  # noqa
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
     "PAGE_SIZE": 100,
 }
 
