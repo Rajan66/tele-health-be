@@ -8,17 +8,17 @@ from .views import (
 
 urlpatterns = [
     path(
-        "notifications/list",
+        "list/",
         NotificationListAPIView.as_view(),
         name="notification-list",
     ),
     path(
-        "notifications/<uuid:id>/mark-as-read/",
+        "<uuid:id>/mark-as-read/",
         NotificationMarkAsReadAPIView.as_view(),
         name="notification-mark-as-read",
     ),
     path(
-        "notifications/mark-all-as-read/",
+        "mark-all-as-read/",
         NotificationMarkAllAsReadAPIView.as_view(),
         name="notification-mark-all-as-read",
     ),

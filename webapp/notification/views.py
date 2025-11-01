@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from notification.models import Notification
-from .serializers import NotificationSerializer
+from notification.serializers import (
+    NotificationSerializer,
+    UpdateNotificationSerializer,
+)
 
 
 class NotificationListAPIView(ListAPIView):
@@ -19,7 +22,7 @@ class NotificationListAPIView(ListAPIView):
 
 
 class NotificationMarkAsReadAPIView(UpdateAPIView):
-    serializer_class = None
+    serializer_class = UpdateNotificationSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "id"
 
