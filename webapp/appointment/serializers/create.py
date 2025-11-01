@@ -61,7 +61,7 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
             doctor=doctor.user,
             health_worker=request.user,
             message=f"New appointment booked by {request.user.email} for {formatted_str}.",  # noqa
-            meeting_link={appointment.meeting_link},
+            meeting_link=appointment.meeting_link,
         )
 
         return appointment
